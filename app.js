@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { poolPromise } = require('./config/db');
+const { poolPromise, sql } = require('./config/db');
 const app = express();
 
 //  Middleware
