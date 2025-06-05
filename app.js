@@ -44,6 +44,47 @@ app.post('/api/clientes', async (req, res) => {
         res.status(500).send(err.message);
     }
 });
+
+app.get('/api/incidencias', async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request().query('SELECT * FROM Incidencias');
+        res.json(result.recordset);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+app.get('/api/incidencias/:id', async (req, res) => {
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query('SELECT * FROM Incidencias WHERE id = @id');
+        if (result.recordset.length === 0) {
+            return res.status(404).send('Cliente no encontrado');
+        }
+        res.json(result.recordset[0]);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+app.post('/api/incidencias', async (req, res) => {
+    try {
+        const { nombre, email } = req.body;
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('NHC', sql.Char, NHC)
+            .input('Fecha', sql.DateTime, Fecha)
+            .input('Incidencia', sql.VarChar, Incidencia)
+            .input('Estado', sql.Char, Estado)
+            .input('Responsable', sql.VarChar, Responsable)
+            .input('Prioridad', sql.VarChar, Prioridad)
+            .query('INSERT INTO Incidencias (NHC, Fecha, Incidencia, Estado, Responsable, Prioridad) VALUES (@NHC, @Fecha, @Incidencia, @Estado, @Responsable, @Prioridad); SELECT SCOPE_IDENTITY() AS id');
+        res.status(201).json({ id: result.recordset[0].id, NHC, Fecha, Incidencia, Estado, Responsable, Prioridad });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
