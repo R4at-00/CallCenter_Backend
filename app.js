@@ -70,7 +70,7 @@ app.get('/api/incidencias/:id', async (req, res) => {
 });
 app.post('/api/incidencias', async (req, res) => {
     try {
-        const { nombre, email } = req.body;
+        const { NHC, Fecha, Incidencia, Estado, Responsable, Prioridad, Clasificacion } = req.body;
         const pool = await poolPromise;
         const result = await pool.request()
             .input('NHC', sql.Char, NHC)
@@ -79,7 +79,8 @@ app.post('/api/incidencias', async (req, res) => {
             .input('Estado', sql.Char, Estado)
             .input('Responsable', sql.VarChar, Responsable)
             .input('Prioridad', sql.VarChar, Prioridad)
-            .query('INSERT INTO Incidencias (NHC, Fecha, Incidencia, Estado, Responsable, Prioridad) VALUES (@NHC, @Fecha, @Incidencia, @Estado, @Responsable, @Prioridad); SELECT SCOPE_IDENTITY() AS id');
+            .input('Clasificacion', sql.VarChar, Clasificacion)
+            .query('INSERT INTO Incidencias (NHC, Fecha, Incidencia, Estado, Responsable, Prioridad, Clasificacion) VALUES (@NHC, @Fecha, @Incidencia, @Estado, @Responsable, @Prioridad, @Clasificacion); SELECT SCOPE_IDENTITY() AS id');
         res.status(201).json({ id: result.recordset[0].id, NHC, Fecha, Incidencia, Estado, Responsable, Prioridad });
     } catch (err) {
         res.status(500).send(err.message);
