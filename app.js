@@ -49,6 +49,21 @@ app.post('/api/incidencias', async (req, res) => {
         res.status(500).send(err.message);
     }
 });
+
+app.patch('/api/incidencias/:id', async (req, res) => {
+    try {
+        const { Respuesta, Estado } = req.body;
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .input('Respuesta', sql.VarChar, Respuesta)
+            .input('Estado', sql.Char, Estado)
+            .query('UPDATE Incidencias set Respuesta = @Respuesta, Estado = @Estado where id = @id;');
+        res.status(201).json({ Respuesta, Estado });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
