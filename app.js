@@ -58,8 +58,8 @@ app.patch('/api/incidencias/:id', async (req, res) => {
             .input('id', sql.Int, req.params.id)
             .input('Respuesta', sql.VarChar, Respuesta)
             .input('Estado', sql.Char, Estado)
-            .query('UPDATE Incidencias set Respuesta = @Respuesta, Estado = @Estado where id = @id;');
-        res.status(201).json({ Respuesta, Estado });
+            .query('update Incidencias set Respuesta = @Respuesta, Estado = @Estado where id = @id; SELECT SCOPE_IDENTITY() AS id');
+        res.status(201).json({ Estado, Respuesta });
     } catch (err) {
         res.status(500).send(err.message);
     }
